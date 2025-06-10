@@ -23,48 +23,66 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $orders = Order::orderBy('created_at','DESC')->take(10)->get();
+        $orders = Order::latest()->take(10)->get();
 
-        $dashboardDatas = DB::select("
-                            SELECT 
-                                SUM(total) AS TotalAmount,
-                                SUM(IF(status = 'ordered', total, 0)) AS TotalOrderedAmount,
-                                SUM(IF(status = 'delivered', total, 0)) AS TotalDeliveredAmount,
-                                SUM(IF(status = 'canceled', total, 0)) AS TotalCanceledAmount,
-                                COUNT(*) AS Total,
-                                COUNT(IF(status = 'ordered', 1, NULL)) AS TotalOrdered,
-                                COUNT(IF(status = 'delivered', 1, NULL)) AS TotalDelivered,
-                                COUNT(IF(status = 'canceled', 1, NULL)) AS TotalCanceled
-                                FROM orders
-                                ");
+        // Dashboard summary
+        $dashboardDatas = Order::selectRaw("
+            SUM(total) AS TotalAmount,
+            SUM(CASE WHEN status = 'ordered' THEN total ELSE 0 END) AS TotalOrderedAmount,
+            SUM(CASE WHEN status = 'delivered' THEN total ELSE 0 END) AS TotalDeliveredAmount,
+            SUM(CASE WHEN status = 'canceled' THEN total ELSE 0 END) AS TotalCanceledAmount,
+            COUNT(*) AS Total,
+            SUM(CASE WHEN status = 'ordered' THEN 1 ELSE 0 END) AS TotalOrdered,
+            SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) AS TotalDelivered,
+            SUM(CASE WHEN status = 'canceled' THEN 1 ELSE 0 END) AS TotalCanceled
+        ")->get();
 
-                        $monthlyDatas = DB::select("SELECT M.id As MonthNo, MonthName,
-                        IFNULL(D.TotalAmount,0) As TotalAmount,
-                        IFNULL(D.TotalOrderedAmount,0) As TotalOrderedAmount,
-                        IFNULL(D.TotalDeliveredAmount,0) As TotalDeliveredAmount,
-                        IFNULL(D.TotalCanceledAmount,0) As TotalCanceledAmount FROM month_names M
-                        LEFT JOIN (Select DATE_FORMAT(created_at, '%b') As MonthName,
-                        MONTH(created_at) As MonthNo,
-                        sum(total) As TotalAmount,
-                        sum(if(status='ordered',total,0)) As TotalOrderedAmount,
-                        sum(if(status='delivered',total,0)) As TotalDeliveredAmount,
-                        sum(if(status='canceled',total,0)) As TotalCanceledAmount
-                        FROM Orders WHERE YEAR(created_at)=YEAR(NOW()) GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b')
-                        Order By MONTH(created_at)) D On D.MonthNo=M.id");
+        // Monthly Data
+        $monthlyDatas = DB::table(DB::raw('month_names AS M'))
+            ->leftJoinSub(
+                Order::selectRaw("
+                    MONTH(created_at) AS MonthNo,
+                    DATE_FORMAT(created_at, '%b') AS MonthName,
+                    SUM(total) AS TotalAmount,
+                    SUM(CASE WHEN status = 'ordered' THEN total ELSE 0 END) AS TotalOrderedAmount,
+                    SUM(CASE WHEN status = 'delivered' THEN total ELSE 0 END) AS TotalDeliveredAmount,
+                    SUM(CASE WHEN status = 'canceled' THEN total ELSE 0 END) AS TotalCanceledAmount
+                ")
+                ->whereYear('created_at', now()->year)
+                ->groupByRaw("YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b')")
+                , 'D'
+            , function ($join) {
+                $join->on('D.MonthNo', '=', 'M.id');
+            })
+            ->select(
+        'M.id as MonthNo',
+        'M.name as MonthName', // <--- FIXED!
+        DB::raw('IFNULL(D.TotalAmount,0) as TotalAmount'),
+        DB::raw('IFNULL(D.TotalOrderedAmount,0) as TotalOrderedAmount'),
+        DB::raw('IFNULL(D.TotalDeliveredAmount,0) as TotalDeliveredAmount'),
+        DB::raw('IFNULL(D.TotalCanceledAmount,0) as TotalCanceledAmount')
+        )
+            ->orderBy('M.id')
+            ->get();
 
-        $AmountM = implode(',',collect($monthlyDatas)->pluck('TotalAmount')->toArray());
-        $OrderedAmountM = implode(',',collect($monthlyDatas)->pluck('TotalOrderedAmount')->toArray());
-        $DeliveredAmountM = implode(',',collect($monthlyDatas)->pluck('TotalDeliveredAmount')->toArray());
-        $CanceledAmountM = implode(',',collect($monthlyDatas)->pluck('TotalCanceledAmount')->toArray());
+        // Pluck untuk chart
+        $AmountM = $monthlyDatas->pluck('TotalAmount')->implode(',');
+        $OrderedAmountM = $monthlyDatas->pluck('TotalOrderedAmount')->implode(',');
+        $DeliveredAmountM = $monthlyDatas->pluck('TotalDeliveredAmount')->implode(',');
+        $CanceledAmountM = $monthlyDatas->pluck('TotalCanceledAmount')->implode(',');
 
-        $TotalAmount = collect($monthlyDatas)->sum('TotalAmount');
-        $TotalOrderedAmount = collect($monthlyDatas)->sum('TotalOrderedAmount');
-        $TotalDeliveredAmount = collect($monthlyDatas)->sum('TotalDeliveredAmount');
-        $TotalCanceledAmount = collect($monthlyDatas)->sum('TotalCanceledAmount');
+        // Totals untuk dashboard
+        $TotalAmount = $monthlyDatas->sum('TotalAmount');
+        $TotalOrderedAmount = $monthlyDatas->sum('TotalOrderedAmount');
+        $TotalDeliveredAmount = $monthlyDatas->sum('TotalDeliveredAmount');
+        $TotalCanceledAmount = $monthlyDatas->sum('TotalCanceledAmount');
 
-        return view('admin.index', compact('orders', 'dashboardDatas','AmountM','OrderedAmountM','DeliveredAmountM','CanceledAmountM','TotalAmount','TotalOrderedAmount','TotalDeliveredAmount','TotalCanceledAmount'));
+        return view('admin.index', compact(
+            'orders', 'dashboardDatas',
+            'AmountM', 'OrderedAmountM', 'DeliveredAmountM', 'CanceledAmountM',
+            'TotalAmount', 'TotalOrderedAmount', 'TotalDeliveredAmount', 'TotalCanceledAmount'
+        ));
     }
-
 
     public function subcategories()
     {
