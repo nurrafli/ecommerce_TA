@@ -303,6 +303,9 @@
           <a href="{{route('home.index')}}">
             <img src="{{ asset('assets/images/logorg.webp') }}" alt="RafliGarden" class="logo__image d-block" />
           </a>
+          <a href="{{route('home.index')}}">
+            <img src="{{ asset('assets/images/logo-poltek.png') }}" alt="RafliGarden" class="logo__image d-block" />
+          </a>
         </div>
   
         <a href="#" class="header-tools__item header-tools__cart js-open-aside" data-aside="cartDrawer">
