@@ -2,16 +2,17 @@
 @section('content')
 <main class="pt-95">
     <div class="mb-4 pb-4"></div>
-    <section class="shop-checkout container">
-        <h2 class="page-title">Shipping and Checkout</h2>
-        <div class="checkout-steps">
-            <a href="{{route('cart.index')}}" class="checkout-steps__item active">
-                <span class="checkout-steps__item-number">01</span>
-                <span class="checkout-steps__item-title">
-                    <span>Shopping Bag</span>
-                    <em>Manage Your Items List</em>
-                </span>
-            </a>
+    <section class="shop-checkout container" style="margin-top: 100px;">
+    <h2 class="page-title">Shipping and Checkout</h2>
+    <div class="checkout-steps">
+        <a href="{{route('cart.index')}}" class="checkout-steps__item active">
+            <span class="checkout-steps__item-number">01</span>
+            <span class="checkout-steps__item-title">
+                <span>Shopping Bag</span>
+                <em>Manage Your Items List</em>
+            </span>
+        </a>
+
             <a href="javascript:void(0)" class="checkout-steps__item active">
                 <span class="checkout-steps__item-number">02</span>
                 <span class="checkout-steps__item-title">
