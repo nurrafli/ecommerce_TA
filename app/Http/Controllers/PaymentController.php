@@ -30,8 +30,19 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Invalid payload'], 400);
         }
 
+        // Ambil server key sebelum hashing
+        $serverKey = Config::$serverKey;
+
+        // Format ulang gross amount agar cocok untuk signature
+        $formattedGrossAmount = number_format((float)$grossAmount, 0, '', '');
+
         // Validasi signature
-        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . Config::$serverKey);
+        $expectedSignature = hash('sha512',
+            (string)$orderId .
+            (string)$statusCode .
+            $formattedGrossAmount .
+            $serverKey
+        );
 
         Log::info('🔐 Signature check', [
             'expected' => $expectedSignature,
