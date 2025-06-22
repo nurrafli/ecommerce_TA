@@ -45,8 +45,10 @@ class HomeController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->input('query');
-        $results = Product::where('name','LIKE',"%($query)%")->get()->take(10);
-        return response()->json($results);
+            $query = $request->input('query');
+            $results = Product::where('name', 'LIKE', '%' . $query . '%')
+                            ->take(10)
+                            ->get();
+            return response()->json($results);
     }
 }

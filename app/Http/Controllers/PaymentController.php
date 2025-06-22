@@ -7,51 +7,58 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\Order;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
     public function midtransCallback(Request $request)
     {
+        // Konfigurasi Midtrans
         Config::$serverKey = env('MIDTRANS_SERVER_KEY');
         Config::$isProduction = false;
 
-        $notification = new Notification();
+        $serverKey = Config::$serverKey;
 
-        $transaction = $notification->transaction_status;
-        $orderId = $notification->order_id; 
-        $grossAmount = $notification->gross_amount;
+        $json = $request->all();
 
-        $orderIdParts = explode('-', $orderId);
-        if (count($orderIdParts) < 3) {
-            return response()->json(['message' => 'Invalid order_id format'], 400);
+        // Validasi Signature Key
+        $expectedSignature = hash('sha512',
+            $json['order_id'] . $json['status_code'] . $json['gross_amount'] . $serverKey
+        );
+
+        if ($json['signature_key'] !== $expectedSignature) {
+            Log::warning('Signature key tidak valid.', ['order_id' => $json['order_id']]);
+            return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        $originalOrderId = $orderIdParts[1]; 
+        // Proses update status jika signature valid
+        $transactionStatus = $json['transaction_status'];
+        $orderIdParts = explode('-', $json['order_id']);
+        $originalOrderId = $orderIdParts[1] ?? null;
 
-        $order = Order::find($originalOrderId);
+        $order = Order::with('transaction')->find($originalOrderId);
+
         if (!$order) {
-            return response()->json([
-                'message' => 'Order not found'], 404);
+            Log::warning('Order tidak ditemukan.', ['order_id' => $originalOrderId]);
+            return response()->json(['message' => 'Order not found'], 404);
         }
 
-        if ($transaction == 'capture' || $transaction == 'settlement') {
-            $order->update([
-                'status' => 'processing',
-                'payment_status' => 'paid',
-            ]);
-        } elseif ($transaction == 'pending') {
-            $order->update([
-                'status' => 'pending',
-                'payment_status' => 'unpaid',
-            ]);
-        } elseif (in_array($transaction, ['deny', 'cancel', 'expire'])) {
-            $order->update([
-                'status' => 'failed',
-                'payment_status' => 'unpaid',
+        if ($order->transaction) {
+            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+                $order->transaction->payment_status = 'paid';
+            } elseif ($transactionStatus == 'pending') {
+                $order->transaction->payment_status = 'pending';
+            } elseif (in_array($transactionStatus, ['deny', 'cancel', 'expire'])) {
+                $order->transaction->payment_status = 'failed';
+            }
+
+            $order->transaction->save();
+            Log::info('Status transaksi berhasil diperbarui.', [
+                'order_id' => $order->id,
+                'status' => $order->transaction->payment_status
             ]);
         }
 
-        \Log::info('Notification received from Midtrans', (array) $notification);
-        return response()->json(['message' => 'Callback processed']);
+        return response()->json(['message' => 'Callback processed'], 200);
     }
 }

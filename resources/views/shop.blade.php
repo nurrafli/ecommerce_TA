@@ -15,12 +15,16 @@
       stroke: #FF1493;
     }
 
+    .bg-soft-blue {
+          background: linear-gradient(to right, #efeaec, #a0c4ff);
+    }
+
 </style>
 
-<main class="pt-100">
-    <section class="shop-main container d-flex pt-4 pt-xl-5 bg-transparent">
-      <div class="shop-sidebar side-sticky " id="shopFilter">
-        <div class="aside-header d-flex d-lg-none align-items-center">
+<main class="pt-100 bg-soft-blue">
+    <section class="shop-main container d-flex pt-4 pt-xl-5 bg-soft-blue">
+      <div class="shop-sidebar side-sticky bg-soft-blue" id="shopFilter">
+        <div class="aside-header d-flex d-lg-none align-items-center bg-soft-blue">
           <h3 class="text-uppercase fs-6 mb-0">Filter By</h3>
           <button class="btn-close-lg js-close-aside btn-close-aside ms-auto"></button>
         </div>

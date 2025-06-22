@@ -55,16 +55,6 @@
             <label>Payment Method</label>
             <span>{{ $order->transaction?->mode ?? '-' }}</span>
         </div>
-
-        <div class="order-info__item">
-            <label>Status </label>
-            <span>{{ $order->transaction->status }}</span>
-        </div>
-
-        <div class="order-info__item">
-            <label>Payment Status</label>
-            <span>{{ $order->transaction?->payment_status ?? '-' }}</span>
-        </div>
         </div>
         <div class="checkout__totals-wrapper">
           <div class="checkout__totals">
@@ -137,9 +127,7 @@
         snap.pay('{{ $snapToken }}', {
             // Optional
             onSuccess: function(result) {
-                 /* You may add your own js here, this is just example */
-                // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
-                console.log(result)
+              window.location.href = '{{route('cart.order.confirmation')}}'
             },
             // Optional
             onPending: function(result) {

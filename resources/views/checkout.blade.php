@@ -173,7 +173,7 @@
                         </div>
                         <div class="policy-text mt-2">
                             Your personal data will be used to process your order, support your experience throughout this
-                            website, and for other purposes described in our <a href="terms.html" target="_blank">privacy policy</a>.
+                            website, and for other purposes described in our.
                         </div>
                     </div>
 

@@ -247,7 +247,7 @@ class CartController extends Controller
         $orders = Order::with('transaction')
             ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
-            ->paginate(5);;
+            ->paginate(10);;
 
         return view('order-confirmation', compact('orders'));
 
@@ -272,7 +272,7 @@ class CartController extends Controller
                 'first_name' => $user->name,
                 'email' => $user->email,
             ],
-            'enabled_payments' => ['gopay', 'shopeepay', 'credit_card','bank_transfer'],
+            'enabled_payments' => ['gopay', 'shopeepay','bank_transfer'],
         ];
 
         $snapToken = Snap::getSnapToken($params);

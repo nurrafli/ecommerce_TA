@@ -27,9 +27,9 @@ class UserController extends Controller
         $order = Order::where('user_id',Auth::user()->id)->where('id',$order_id)->first();
         if($order)
         {
-            $orderItems = OrderItem::where('order_id',$order->id)->orderBy('id')->paginate(12);
+            $items = OrderItem::where('order_id',$order->id)->orderBy('id')->paginate(12);
             $transaction = Transaction::where('order_id',$order->id)->first();
-            return view('user.order-details',compact('order','orderItems','transaction'));
+            return view('user.order-details',compact('order','items','transaction'));
         }
         else
         {
