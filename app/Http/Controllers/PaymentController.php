@@ -31,6 +31,15 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
+        Log::info('Debug signature', [
+        'expected' => $expectedSignature,
+        'received' => $json['signature_key'],
+        'serverKey' => $serverKey,
+        'order_id' => $json['order_id'],
+        'status_code' => $json['status_code'],
+        'gross_amount' => $json['gross_amount']
+        ]);
+
         // Proses update status jika signature valid
         $transactionStatus = $json['transaction_status'];
         $orderIdParts = explode('-', $json['order_id']);
