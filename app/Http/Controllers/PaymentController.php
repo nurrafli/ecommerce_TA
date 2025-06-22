@@ -7,7 +7,7 @@ use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\Order;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log; 
 
 class PaymentController extends Controller
 {
@@ -34,7 +34,7 @@ class PaymentController extends Controller
         // Proses update status jika signature valid
         $transactionStatus = $json['transaction_status'];
         $orderIdParts = explode('-', $json['order_id']);
-        $originalOrderId = $orderIdParts[1] ?? null;
+        $originalOrderId = $orderIdParts[2] ?? null;
 
         $order = Order::with('transaction')->find($originalOrderId);
 
