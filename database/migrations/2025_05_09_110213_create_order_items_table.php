@@ -13,17 +13,19 @@ return new class extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Order::class, 'order_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('order_id');
             $table->string('product_name');
-            $table->bigInteger('product_id')->unsigned();
-            $table->integer('price');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedInteger('price');
             $table->integer('quantity');
             $table->longText('options')->nullable();
-            $table->boolean('rstatus')->default(false);
+            $table->boolean('rstatus')->default(0);
             $table->timestamps();
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
+
     }
 
     /**
