@@ -13,8 +13,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('image')->nullable();
+
+            $table->unsignedBigInteger('parent_id')->nullable(); // nested category
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
+
             $table->timestamps();
         });
+
 
     }
 

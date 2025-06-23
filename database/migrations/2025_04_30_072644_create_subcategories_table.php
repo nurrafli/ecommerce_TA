@@ -16,8 +16,15 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('image')->nullable();
+
+            // Relasi ke kategori induk (wajib)
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+
+            // Relasi ke subkategori parent (opsional, untuk nested sub-subkategori)
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('subcategories')->onDelete('cascade');
+
             $table->timestamps();
         });
 
