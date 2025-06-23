@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\Order::class, 'order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('product_name');
             $table->bigInteger('product_id')->unsigned();
             $table->bigInteger('order_id')->unsigned();

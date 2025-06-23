@@ -9,97 +9,59 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
-    public function midtransCallback(Request $request)
+    public function midtransCallback(Request $request, MidtransService $midtransService)
     {
-        // Konfigurasi Midtrans
-        Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        Config::$isProduction = false;
+        if ($midtransService->isSignatureKeyVerified()) {
+            $order = $midtransService->getOrder();
+ 
+            if ($midtransService->getStatus() == 'success') {
+                $order->update([
+                    'status' => 'processing',
+                    'payment_status' => 'paid',
+                ]);
+ 
+                $lastPayment = $order->payments()->latest()->first();
+                $lastPayment->update([
+                    'status' => 'PAID',
+                    'paid_at' => now(),
+                ]);
 
-        Log::info('📩 Midtrans callback HIT', $request->all());
-
-        $json = $request->all();
-
-        // Ambil data dengan aman
-        $signatureKey = data_get($json, 'signature_key');
-        $orderId = data_get($json, 'order_id');
-        $statusCode = data_get($json, 'status_code');
-        $grossAmount = data_get($json, 'gross_amount');
-
-        if (!$signatureKey || !$orderId || !$statusCode || !$grossAmount) {
-            Log::error('❌ Payload tidak lengkap.', $json);
-            return response()->json(['message' => 'Invalid payload'], 400);
-        }
-
-        // Ambil server key sebelum hashing
-        $serverKey = Config::$serverKey;
-
-        // Format ulang gross amount agar cocok untuk signature
-        $formattedGrossAmount = number_format((float)$grossAmount, 0, '', '');
-
-        // Validasi signature
-        $expectedSignature = hash('sha512',
-            (string)$orderId .
-            (string)$statusCode .
-            $formattedGrossAmount .
-            $serverKey
-        );
-
-        Log::info('🔐 Signature check', [
-            'expected' => $expectedSignature,
-            'received' => $signatureKey
-        ]);
-
-        if ($signatureKey !== $expectedSignature) {
-            Log::warning('🚫 Signature key tidak valid.', ['order_id' => $orderId]);
-            return response()->json(['message' => 'Invalid signature'], 403);
-        }
-
-        // Ambil ID order asli (contoh: ORDER-WEB-123 -> ambil 123)
-        $orderIdParts = explode('-', $orderId);
-        $originalOrderId = $orderIdParts[2] ?? null;
-
-        if (!$originalOrderId || !is_numeric($originalOrderId)) {
-            Log::warning('⚠️ Format order_id tidak valid.', ['order_id' => $orderId]);
-            return response()->json(['message' => 'Invalid order_id format'], 400);
-        }
-
-        $order = Order::with('transaction')->find($originalOrderId);
-
-        if (!$order) {
-            Log::warning('❓ Order tidak ditemukan.', ['order_id' => $originalOrderId]);
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
-        // Update status pembayaran
-        $transactionStatus = $json['transaction_status'];
-
-        if ($order->transaction) {
-            switch ($transactionStatus) {
-                case 'capture':
-                case 'settlement':
-                    $order->transaction->payment_status = 'paid';
-                    break;
-                case 'pending':
-                    $order->transaction->payment_status = 'pending';
-                    break;
-                case 'deny':
-                case 'cancel':
-                case 'expire':
-                    $order->transaction->payment_status = 'failed';
-                    break;
-                default:
-                    Log::warning('⚠️ Status transaksi tidak dikenali.', ['status' => $transactionStatus]);
-                    break;
+                if ($order->transaction) {
+                $order->transaction->update([
+                    'payment_status' => 'paid',
+                ]);
+                } else {
+                    Log::warning('Transaction not found for order', ['order_id' => $order->id]);
+                }
             }
-
-            $order->transaction->save();
-
-            Log::info('✅ Status transaksi diperbarui.', [
-                'order_id' => $order->id,
-                'status' => $order->transaction->payment_status
-            ]);
+ 
+            if ($midtransService->getStatus() == 'pending') {
+                // lakukan sesuatu jika pembayaran masih pending, seperti mengirim notifikasi ke customer
+                // bahwa pembayaran masih pending dan harap selesai pembayarannya
+            }
+ 
+            if ($midtransService->getStatus() == 'expire') {
+                // lakukan sesuatu jika pembayaran expired, seperti mengirim notifikasi ke customer
+                // bahwa pembayaran expired dan harap melakukan pembayaran ulang
+            }
+ 
+            if ($midtransService->getStatus() == 'cancel') {
+                // lakukan sesuatu jika pembayaran dibatalkan
+            }
+ 
+            if ($midtransService->getStatus() == 'failed') {
+                // lakukan sesuatu jika pembayaran gagal
+            }
+ 
+            return response()
+                ->json([
+                    'success' => true,
+                    'message' => 'Notifikasi berhasil diproses',
+                ]);
+        } else {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 401);
         }
-
-        return response()->json(['message' => 'Callback processed'], 200);
     }
 }

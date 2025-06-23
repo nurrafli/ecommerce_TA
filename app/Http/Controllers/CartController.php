@@ -198,10 +198,12 @@ class CartController extends Controller
 
         $order = new Order();
         $order->user_id = $user_id;
+        $order->order_id = 'ORD-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4)); // kode unik
         $order->subtotal = str_replace(',', '', $checkout['subtotal']);
         $order->discount = str_replace(',', '', $checkout['discount']);
         $order->tax = str_replace(',', '', $checkout['tax']);
         $order->total = str_replace(',', '', $checkout['total']);
+
 
         // Isi alamat dari data address
         $order->name = $address->name;
@@ -253,30 +255,23 @@ class CartController extends Controller
 
     }
 
-    public function show($id)
+    public function show(MidtransService $midtransService, Order $order)
     {
-        $order = Order::findOrFail($id);
-        $user = $order->user;
-
-        Config::$serverKey = config('services.midtrans.server_key');
-        Config::$isProduction = config('services.midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => 'ORD'. '-' . $order->id . '-' . time(),
-                'gross_amount' => (int) $order->total,
-            ],
-            'customer_details' => [
-                'first_name' => $user->name,
-                'email' => $user->email,
-            ],
-            'enabled_payments' => ['gopay', 'shopeepay','bank_transfer'],
-        ];
-
-        $snapToken = Snap::getSnapToken($params);
-        return view('show', compact('snapToken', 'order'));
+        // get last payment
+        $payment = $order->payments->last();
+ 
+        if ($payment == null || $payment->status == 'EXPIRED') {
+            $snapToken = $midtransService->createSnapToken($order);
+ 
+            $order->payments()->create([
+                'snap_token' => $snapToken,
+                'status' => 'PENDING',
+            ]);
+        } else {
+            $snapToken = $payment->snap_token;
+        }
+ 
+        return view('show', compact('order', 'snapToken'));
     }
 
     public function setAmountforCheckout()

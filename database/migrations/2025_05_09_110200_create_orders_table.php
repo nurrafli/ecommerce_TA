@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('order_id', 32)->unique();
             $table->bigInteger('user_id')->unsigned();
             $table->int('subtotal');
             $table->int('discount')->default(0);
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->string('landmark')->nullable();
             $table->string('zip');
             $table->string('type')->default('home');
-            $table->enum('status',['ordered','delivered','canceled'])->default('ordered');
+            $table->enum('status',['pending','processing','completed','cancelled'])->default('pending');
             $table->boolean('is_shipping_different')->default(false);
             $table->date('delivered_date')->nullable();
             $table->date('canceled_date')->nullable();

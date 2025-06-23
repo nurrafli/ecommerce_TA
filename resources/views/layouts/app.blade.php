@@ -378,23 +378,18 @@
               <li class="navigation__item">
                 <a href="{{route('home.contact')}}" class="navigation__link">Contact</a>
               </li>
-            </ul>
-          </div>
-        </div>
-
-          @guest
-            <div class="border-top mt-auto pb-2 bg-soft-blue">
-              <div class="customer-links container mt-4 mb-2 pb-1">
-                <a href="{{route('login')}}" class="header-tools__item">
+              <li class="navigation__item">
+               <a href="{{route('login')}}" class="header-tools__item">
                   <svg class="d-inline-block align-middle" width="20" height="20" viewBox="0 0 20 20" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <use href="#icon_user" />
                   </svg>
                   <span class="d-inline-block ms-2 text-uppercase align-middle fw-medium">My Account</span>
                 </a>
-              </div>
-            </div>
-            @else
+              <li>
+            </ul>
+          </div>
+        </div>
             <div class="border-top mt-auto pb-2 bg-soft-blue">
               <div class="customer-links container mt-4 mb-2 pb-1">
               <a href="{{Auth::user()->utype === 'ADM' ? route('admin.index'): route('user.index') }}" class="header-tools__item">
