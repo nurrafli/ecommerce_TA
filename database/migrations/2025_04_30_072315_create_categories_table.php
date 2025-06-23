@@ -13,12 +13,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('image')->nullable();
-            $table->unsignedBigInteger('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->index('parent_id');
-
             $table->timestamps();
         });
+
     }
 
     public function down(): void
