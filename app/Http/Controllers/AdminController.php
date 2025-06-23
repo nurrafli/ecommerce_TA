@@ -84,7 +84,6 @@ class AdminController extends Controller
         ));
     }
 
-    
     public function subcategories()
     {
         $subcategories = Subcategory::whereNotNull('parent_id')->orderBy('id', 'DESC')->paginate(10);
@@ -169,6 +168,12 @@ class AdminController extends Controller
 
         $subcategory->delete();
         return redirect()->route('admin.subcategories')->with('status', 'Subcategory deleted successfully');
+    }
+
+    public function categories()
+    {
+        $categories = Category::orderBy('id','DESC')->paginate(10);
+        return view('admin.categories', compact('categories'));
     }
 
     public function category_add()
