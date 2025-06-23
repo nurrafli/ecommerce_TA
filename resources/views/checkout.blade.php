@@ -161,11 +161,7 @@
                         <h4>Select Payment Method</h4>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="mode" value="card" id="mode1" required>
-                            <label class="form-check-label" for="mode1">Debit or Credit Card</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="mode" value="paypal" id="mode2" required>
-                            <label class="form-check-label" for="mode2">E-Wallet</label>
+                            <label class="form-check-label" for="mode1">E-Wallet</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="mode" value="cod" id="mode3" required>
