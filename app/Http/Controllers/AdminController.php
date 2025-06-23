@@ -84,29 +84,32 @@ class AdminController extends Controller
         ));
     }
 
+    
+    public function subcategories()
+    {
+        $subcategories = Subcategory::whereNotNull('parent_id')->orderBy('id', 'DESC')->paginate(10);
+        return view('admin.subcategories', compact('subcategories'));
+    }
+
     public function add_subcategory()
-     {
-            $categories = Category::whereNull('parent_id')->orderBy('name')->get();
-            return view('admin.subcategory-add', compact('categories'));
+    {
+        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
+        return view('admin.subcategory-add', compact('categories'));
     }
 
     public function subcategory_store(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:categories,slug',
             'parent_id' => 'required|exists:categories,id',
             'image' => 'nullable|mimes:png,jpg,jpeg|max:3000',
         ]);
 
-
         $subcategory = new Subcategory();
         $subcategory->name = $request->name;
-        $subcategory->slug = Str::slug($request->slug);
+        $subcategory->slug = Str::slug($request->name);
         $subcategory->parent_id = $request->parent_id;
-        $subcategory->save();
-
-
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -166,24 +169,6 @@ class AdminController extends Controller
 
         $subcategory->delete();
         return redirect()->route('admin.subcategories')->with('status', 'Subcategory deleted successfully');
-    }
-
-    private function generateThumbnailImage($image, $imageName)
-    {
- 
-        $destinationPath = public_path('uploads/categories');
-        $img = Image::read($image->path());
-        $img->cover(124,124,"top");
-        $img->resize(124,124,function($constraint){
-            $constraint->aspectRatio();
-        })->save($destinationPath.'/'.$imageName);
-    
-    }
-
-    public function categories()
-    {
-        $categories = Category::orderBy('id','DESC')->paginate(10);
-        return view('admin.categories', compact('categories'));
     }
 
     public function category_add()
