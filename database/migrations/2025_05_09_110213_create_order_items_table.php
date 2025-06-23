@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Order::class, 'order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('product_name');
             $table->bigInteger('product_id')->unsigned();
-            $table->bigInteger('order_id')->unsigned();
             $table->integer('price', 15, 2);
             $table->integer('quantity');
             $table->longText('options')->nullable();
