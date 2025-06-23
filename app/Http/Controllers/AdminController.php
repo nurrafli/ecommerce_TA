@@ -92,13 +92,6 @@ class AdminController extends Controller
         return view('admin.subcategory-add', compact('categories', 'subcategories'));
     }
 
-
-    public function add_subcategory()
-    {
-        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
-        return view('admin.subcategory-add', compact('categories'));
-    }
-
     public function subcategory_store(Request $request)
     {
         $request->validate([
