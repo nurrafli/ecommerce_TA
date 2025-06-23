@@ -56,9 +56,6 @@
                             <tr>
                                 <td>{{$subcategory->id}}</td>
                                 <td class="pname">
-                                    <div class="image">
-                                        <img src="{{asset('uploads/categories')}}/{{$subcategory->image}}" alt="{{$subcategory->name}}" class="image">
-                                    </div>
                                     <div class="name">
                                         <a href="#" class="body-title-2">{{$subcategory->name}}</a>
                                     </div>

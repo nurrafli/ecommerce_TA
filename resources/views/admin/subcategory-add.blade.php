@@ -50,23 +50,6 @@
                 </fieldset>
                 @error('parent_id') <span class="alert-danger text-center">{{ $message }}</span> @enderror
 
-                <fieldset>
-                    <div class="body-title">Upload Image <span class="tf-color-1">*</span></div>
-                    <div class="upload-image flex-grow">
-                        <div class="item" id="imgpreview" style="display:none">
-                            <img src="#" class="effect8" alt="">
-                        </div>
-                        <div id="upload-file" class="item up-load">
-                            <label class="uploadfile" for="myFile">
-                                <span class="icon"><i class="icon-upload-cloud"></i></span>
-                                <span class="body-text">Drop your image or <span class="tf-color">click to browse</span></span>
-                                <input type="file" id="myFile" name="image" accept="image/*">
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-                @error('image') <span class="alert-danger text-center">{{ $message }}</span> @enderror
-
                 <div class="bot">
                     <div></div>
                     <button class="tf-button w208" type="submit">Save</button>
