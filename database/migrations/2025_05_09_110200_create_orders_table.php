@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('order_id', 32)->unique();
             $table->bigInteger('user_id')->unsigned();
-            $table->int('subtotal');
-            $table->int('discount')->default(0);
-            $table->int('tax');
-            $table->int('total');
+            $table->integer('subtotal');
+            $table->integer('discount')->default(0);
+            $table->integer('tax');
+            $table->integer('total');
             $table->string('name');
             $table->string('phone');
             $table->string('locality');
