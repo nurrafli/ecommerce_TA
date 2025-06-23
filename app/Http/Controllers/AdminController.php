@@ -84,11 +84,14 @@ class AdminController extends Controller
         ));
     }
 
-    public function subcategories()
+    public function add_subcategory()
     {
-        $subcategories = Subcategory::whereNotNull('parent_id')->orderBy('id', 'DESC')->paginate(10);
-        return view('admin.subcategories', compact('subcategories'));
+        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
+        $subcategories = Subcategory::whereNull('parent_id')->orderBy('name')->get();
+
+        return view('admin.subcategory-add', compact('categories', 'subcategories'));
     }
+
 
     public function add_subcategory()
     {
@@ -100,15 +103,19 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:categories,slug',
-            'parent_id' => 'required|exists:categories,id',
+            'slug' => 'required|unique:subcategories,slug',
+            'category_id' => 'required|exists:categories,id',
+            'parent_id' => 'nullable|exists:subcategories,id', // jika nested sub-subkategori
             'image' => 'nullable|mimes:png,jpg,jpeg|max:3000',
         ]);
+
 
         $subcategory = new Subcategory();
         $subcategory->name = $request->name;
         $subcategory->slug = Str::slug($request->name);
-        $subcategory->parent_id = $request->parent_id;
+        $subcategory->category_id = $request->category_id;
+        $subcategory->parent_id = $request->parent_id ?? null;
+
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
