@@ -19,7 +19,11 @@
                     <em>Checkout Your Items List</em>
                 </span>
             </a>
+<<<<<<< HEAD
+            <a href="javascript:void(0)" class="checkout-steps__item">
+=======
             <a href="{{route('cart.order.confirmation')}}" class="checkout-steps__item">
+>>>>>>> 3a36b93 (ganti)
                 <span class="checkout-steps__item-number">03</span>
                 <span class="checkout-steps__item-title">
                     <span>Confirmation</span>
@@ -70,9 +74,43 @@
             </tr>
           @empty
             <tr>
-              <td colspan="10" class="text-center text-muted">Tidak ada data order.</td>
+              <th scope="col">Order Number</th>
+              <th scope="col">Nama Pembeli</th>
+              <th scope="col">Alamat</th>
+              <th scope="col">No Telepon</th>
+              <th scope="col">Date</th>
+              <th scope="col">Total</th>
+              <th scope="col">Metode Pembayaran</th>
+              <th scope="col">Status Pembayaran</th>
+              <th scope="col">Status Pesanan</th>
+              <th scope="col">Keterangan</th>
             </tr>
+<<<<<<< HEAD
+          </thead>
+            <tbody>
+              @forelse($orders as $order)
+                <tr>
+                    <td>{{$order->id}}</td>
+                  <td>{{ $order->name }}</td>
+                  <td>{{ $order->address }}</td>
+                  <td>{{ $order->phone }}</td>
+                  <td>{{ $order->created_at->format('d-m-Y') }}</td>
+                  <td>Rp{{ number_format($order->total, 0, ',', '.') }}</td>
+                  <td>{{ $order->transaction?->mode ?? '-' }}</td>
+                  <td>{{ $order->transaction?->payment_status ?? '-' }}</td>
+                  <td>{{ $order->status }}</td>
+                  <td>
+                      <a href="{{route('customer.orders.show', $order->id)}}" class="btn btn-primary">Detail</a>
+                  </td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="5">Tidak ada data</td>
+                </tr>
+              @endforelse
+=======
           @endforelse
+>>>>>>> 3a36b93 (ganti)
             </tbody>
         </table>
       </div>
