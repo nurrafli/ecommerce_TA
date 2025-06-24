@@ -3,7 +3,7 @@
 @section('content')
 <style>
     
-   
+   c
     @media (max-width: 768px) {
         .page-title {
             font-size: 1.5rem;
