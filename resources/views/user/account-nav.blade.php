@@ -1,5 +1,5 @@
 <ul class="account-nav">
-    <li><a href="{{route('user.index')}}" class="menu-link menu-link_us-s">Dashboard</a></li>
+    <li><a href="{{route('user.index')}}" class="menu-link menu-link_us-s">Account</a></li>
     <li><a href="{{route('user.orders')}}" class="menu-link menu-link_us-s">Orders</a></li>
     
     <li>
