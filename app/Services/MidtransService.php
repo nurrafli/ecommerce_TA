@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Midtrans\Snap;
 use Exception;
+use Illuminate\Support\Str;
 
 class MidtransService
 {
@@ -31,12 +31,19 @@ class MidtransService
 
     public function createSnapToken(Order $order): string
     {
+        $itemDetails = $this->mapItemsToDetails($order);
+
+        // Hitung total otomatis dari item_details
+        $grossAmount = array_sum(array_map(function ($item) {
+            return $item['price'] * $item['quantity'];
+        }, $itemDetails));
+
         $params = [
             'transaction_details' => [
-                'order_id' => $order->order_id, // gunakan order_id dari tabel
-                'gross_amount' => (int) $order->total,
+                'order_id' => $order->order_id,
+                'gross_amount' => $grossAmount,
             ],
-            'item_details' => $this->mapItemsToDetails($order),
+            'item_details' => $itemDetails,
             'customer_details' => $this->getCustomerDetails($order),
         ];
 
@@ -89,17 +96,17 @@ class MidtransService
     {
         return $order->items->map(function ($item) {
             return [
-                'id' => (string)$item->product_id,
-                'price' => (int)$item->price,
+                'id' => (string) $item->product_id,
+                'price' => (int) $item->price,
                 'quantity' => $item->quantity,
-                'name' => $item->product_name,
+                'name' => Str::limit($item->product_name, 50), // ✅ batasi panjang nama
             ];
         })->toArray();
     }
 
     protected function getCustomerDetails(Order $order): array
     {
-        $user = $order->user; // pastikan relasi 'user' ada di model Order
+        $user = $order->user;
 
         return [
             'first_name' => $user->name ?? 'Guest',
