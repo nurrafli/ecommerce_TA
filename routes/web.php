@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanController;
 
+Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);
 Auth::routes();
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
