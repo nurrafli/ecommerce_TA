@@ -46,13 +46,6 @@ class MidtransService
             'item_details' => $itemDetails,
             'customer_details' => $this->getCustomerDetails($order),
         ];
-        dd([
-            'mapped_items_for_midtrans' => $itemDetails,
-            'gross_amount' => $grossAmount,
-            'item_total_check' => collect($itemDetails)->sum(fn ($item) => $item['price'] * $item['quantity']),
-            'item_names' => array_map(fn($i) => strlen($i['name']) . ' chars: ' . $i['name'], $itemDetails),
-        ]);
-
         try {
             return Snap::getSnapToken($params);
         } catch (Exception $e) {
@@ -105,10 +98,11 @@ class MidtransService
                 'id' => (string) $item->product_id,
                 'price' => (int) $item->price,
                 'quantity' => $item->quantity,
-                'name' => Str::limit($item->product_name, 50), // ✅ batasi panjang nama
+                'name' => substr($item->product_name, 0, 50), // <= ini fix-nya
             ];
         })->toArray();
     }
+
 
     protected function getCustomerDetails(Order $order): array
     {
