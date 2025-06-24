@@ -46,6 +46,15 @@ class MidtransService
             'item_details' => $itemDetails,
             'customer_details' => $this->getCustomerDetails($order),
         ];
+        dd([
+            'order_items_raw' => $order->items, // data mentah dari database
+            'mapped_items_for_midtrans' => $itemDetails, // yang akan dikirim ke Midtrans
+            'gross_amount' => $grossAmount, // total hitungan
+            'item_total_check' => collect($itemDetails)->sum(function ($item) {
+                return $item['price'] * $item['quantity'];
+            }),
+        ]);
+
 
         try {
             return Snap::getSnapToken($params);

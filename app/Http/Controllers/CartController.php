@@ -256,24 +256,36 @@ class CartController extends Controller
 
     }
 
-    public function show(MidtransService $midtransService, Order $order)
-    {
-        // get last payment
-        $payment = $order->payments->last();
- 
-        if ($payment == null || $payment->status == 'EXPIRED') {
+public function show(MidtransService $midtransService, Order $order)
+{
+    // Ambil pembayaran terakhir
+    $payment = $order->payments()->latest()->first();
+
+    // Cek apakah belum ada pembayaran atau statusnya expired
+    if (!$payment || $payment->status === 'EXPIRED') {
+
+        try {
+            // Buat Snap Token baru
             $snapToken = $midtransService->createSnapToken($order);
- 
+
+            // Simpan ke tabel payments
             $order->payments()->create([
                 'snap_token' => $snapToken,
                 'status' => 'PENDING',
             ]);
-        } else {
-            $snapToken = $payment->snap_token;
+        } catch (\Exception $e) {
+            // Tangani jika gagal membuat token (misal item name terlalu panjang, dsb)
+            return back()->withErrors(['midtrans' => 'Gagal membuat Snap Token: ' . $e->getMessage()]);
         }
- 
-        return view('show', compact('order', 'snapToken'));
+
+    } else {
+        // Jika pembayaran sebelumnya masih aktif, pakai token yang ada
+        $snapToken = $payment->snap_token;
     }
+
+    return view('show', compact('order', 'snapToken'));
+}
+
 
     public function setAmountforCheckout()
     {
