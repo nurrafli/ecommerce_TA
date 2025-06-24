@@ -1,61 +1,40 @@
 @extends('layouts.app')
 @section('content')
 <style>
-    .page-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 0.5rem;
-        color: #333;
+    .table> :not(caption)>tr>th {
+      padding: 0.625rem 1.5rem .625rem !important;
+      background-color: #6a6e51 !important;
     }
 
-    .table th {
-        background-color: #6a6e51;
-        color: white;
-        font-size: 13px;
-        padding: 10px;
-        text-align: center;
+    .table>tr>td {
+      padding: 0.625rem 1.5rem .625rem !important;
     }
 
-    .table td {
-        font-size: 13px;
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #6a6e51;
+    .table-bordered> :not(caption)>tr>th,
+    .table-bordered> :not(caption)>tr>td {
+      border-width: 1px 1px;
+      border-color: #6a6e51;
     }
 
-    .badge {
-        padding: 4px 10px;
-        border-radius: 5px;
-        font-size: 0.75rem;
-        font-weight: 500;
+    .table> :not(caption)>tr>td {
+      padding: .8rem 1rem !important;
     }
-
     .bg-success {
-        background-color: #40c710 !important;
+      background-color: #40c710 !important;
     }
 
     .bg-danger {
-        background-color: #f44032 !important;
+      background-color: #f44032 !important;
     }
 
     .bg-warning {
-        background-color: #f5d700 !important;
-        color: #000;
+      background-color: #f5d700 !important;
+      color: #000;
     }
+  </style>
 
-    .order-table-container {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-</style>
-
-<main class="pt-100">
+<main class="pt-90" style="padding-top: 0px;">
+    <div class="mb-4 pb-4"></div>
     <section class="my-account container">
         <h2 class="page-title">Orders</h2>
         <div class="row">
@@ -64,60 +43,68 @@
             </div>
 
             <div class="col-lg-10">
-                <div class="order-table-container">
+                <div class="wg-table table-all-user">
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px">Order No</th>
+                                    <th style="width: 80px">OrderNo</th>
                                     <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Subtotal</th>
-                                    <th>Tax</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th>Order Date</th>
-                                    <th>Items</th>
-                                    <th>Delivered On</th>
-                                    <th>Action</th>
+                                    <th class="text-center">Phone</th>
+                                    <th class="text-center">Subtotal</th>
+                                    <th class="text-center">Tax</th>
+                                    <th class="text-center">Total</th>
+                                    
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Order Date</th>
+                                    <th class="text-center">Items</th>
+                                    <th class="text-center">Delivered On</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($orders as $order)
                                 <tr>
-                                    <td>{{ $order->id }}</td>
-                                    <td>{{ $order->name }}</td>
-                                    <td>{{ $order->phone }}</td>
-                                    <td>Rp{{ number_format($order->subtotal, 0, ',', '.') }}</td>
-                                    <td>Rp{{ number_format($order->tax, 0, ',', '.') }}</td>
-                                    <td>Rp{{ number_format($order->total, 0, ',', '.') }}</td>
-                                    <td>
+                                    <td class="text-center">{{$order->id}}</td>  
+                                    <td class="text-center">{{$order->name}}</td>
+                                    <td class="text-center">{{$order->phone}}</td>
+                                    <td class="text-center">Rp{{$order->subtotal}}</td>
+                                    <td class="text-center">Rp{{$order->tax}}</td>
+                                    <td class="text-center">Rp{{$order->total}}</td>
+                                    <td class="text-center">
                                         @if($order->status == 'delivered')
                                             <span class="badge bg-success">Delivered</span>
-                                        @elseif($order->status == 'canceled')
+                                        @elseif($order->status =='canceled')
                                             <span class="badge bg-danger">Canceled</span>
                                         @else
                                             <span class="badge bg-warning">Ordered</span>
                                         @endif
                                     </td>
-                                    <td>{{ $order->created_at->format('d-m-Y') }}</td>
-                                    <td>{{ $order->items->count() }}</td>
-                                    <td>{{ $order->delivered_date ?? '-' }}</td>
-                                    <td>
-                                        <a href="{{ route('user.order.details', ['order_id' => $order->id]) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fa fa-eye"></i>
+                                    <td class="text-center">{{$order->created_at}}</td>
+                                    <td class="text-center">{{$order->orderItems->count()}}</td>
+                                    <td class="text-center">{{$order->delivered_date}}</td>
+                                    <td class="text-center">
+                                        <a href="{{route('user.order.details',['order_id'=>$order->id])}}">
+                                        <div class="list-icon-function view-icon">
+                                            <div class="item eye">
+                                                <i class="fa fa-eye"></i>
+                                            </div>                                        
+                                        </div>
                                         </a>
                                     </td>
                                 </tr>
                                 @endforeach
+                                                                  
                             </tbody>
                         </table>                
                     </div>
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $orders->links('pagination::bootstrap-5') }}
-                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">                
+                    {{$orders->links('pagination::bootstrap-5')}}
                 </div>
             </div>
+            
         </div>
     </section>
 </main>

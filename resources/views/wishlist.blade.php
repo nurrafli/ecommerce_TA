@@ -1,8 +1,10 @@
 @extends('layouts.app')
 @section('content')
-<main class="pt-100">
+<main class="pt-90">
+    <div class="mb-4 pb-4"></div>
     <section class="shop-checkout container">
       <h2 class="page-title">Wishlist</h2>
+      
       <div class="shopping-cart">
         @if(Cart::instance('wishlist')->content()->count()>0)
         <div class="cart-table__wrapper">
@@ -22,7 +24,7 @@
               <tr>
                 <td>
                   <div class="shopping-cart__product-item">
-                    <img loading="lazy" src="{{asset('uploads/products')}}/{{$item->model->image}}" width="120" height="120" alt="{{$item->name}}" />
+                    <img loading="lazy" src="{{asset('uploads/products/thumbnails')}}/{{$item->model->image}}" width="120" height="120" alt="{{$item->name}}" />
                   </div>
                 </td>
                 <td>
@@ -71,7 +73,7 @@
             <form method="POST" action="{{route('wishlist.item.clear')}}">
               @csrf
               @method('DELETE')
-            <button type="submit" class="btn btn-light bg-body">CLEAR WISHLIST</button>
+            <button type="submit" class="btn btn-light">CLEAR WISHLIST</button>
           </div>
         </div>
         @else

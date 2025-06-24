@@ -7,10 +7,10 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'UDHSPecah Belah') }}</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="author" content="surfside media" />
-    <link rel="shortcut icon" href="{{ asset('images/logo/logo_1.png') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.gstatic.com/">
     <link
         href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
@@ -26,7 +26,7 @@
     @stack("styles")
 
 </head>
-<body class="gradient-pink-blue">
+<body class="gradient-bg">
     <svg class="d-none">
       <symbol id="icon_nav" viewBox="0 0 25 18">
         <rect width="25" height="2" />
@@ -253,7 +253,7 @@
     <style>
       #header {
         padding-top: 8px;
-        padding-bottom: 4px;
+        padding-bottom: 8px;
       }
   
       .logo__image {
@@ -289,13 +289,6 @@
       #box-content-search .product-item {
         margin-bottom: 10px;
       }
-
-      .gradient-pink-blue {
-        background: linear-gradient(to right, #efeaec, #a0c4ff);
-      }
-      .bg-soft-blue {
-          background: linear-gradient(to right, #efeaec, #a0c4ff);
-      }
       .logo {
           display: flex;
           align-items: center;
@@ -321,28 +314,25 @@
           <button class="btn-close-lg position-absolute top-0 start-0 w-100"></button>
         </a>
   
-        <div class="logo d-flex align-items-center gap-2">
-            <a href="{{route('home.index')}}">
-              <img src="{{ asset('images/logo/logo_3.png') }}" alt="Uomo" class="logo__image d-block" />
-            </a>
-            <a href="{{route('home.index')}}">
-              <img src="{{ asset('images/logo/logo_2.png') }}" alt="Uomo" class="logo__image d-block" />
-            </a>
-        </div>
- 
-         <a href="{{route('cart.index')}}" class="header-tools__item header-tools__cart">
-              <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <use href="#icon_cart" />
-              </svg>
-              @if(Cart::instance('cart')->count()>0)
-              <span class="cart-amount d-block position-absolute js-cart-items-count">{{Cart::instance('cart')->content()->count() }}</span>
-              @endif
+        <div class="logo">
+          <a href="{{route('home.index')}}">
+            <img src="{{ asset('assets/images/logorg.webp') }}" alt="RafliGarden" class="logo__image d-block" />
           </a>
+          <a href="{{route('home.index')}}">
+            <img src="{{ asset('assets/images/logo-poltek.png') }}" alt="RafliGarden" class="logo__image d-block" />
+          </a>
+        </div>
+  
+        <a href="#" class="header-tools__item header-tools__cart js-open-aside" data-aside="cartDrawer">
+          <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <use href="#icon_cart" />
+          </svg>
+          <span class="cart-amount d-block position-absolute js-cart-items-count">3</span>
+        </a>
       </div>
   
       <nav
-        class="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-soft-blue overflow-auto">
+        class="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto">
         <div class="container">
           <form action="#" method="GET" class="search-field position-relative mt-4 mb-3">
             <div class="position-relative">
@@ -363,7 +353,7 @@
           </form>
         </div>
   
-        <div class="container bg-soft-blue">
+        <div class="container">
           <div class="overflow-hidden">
             <ul class="navigation__list list-unstyled position-relative">
               <li class="navigation__item">
@@ -378,8 +368,12 @@
               <li class="navigation__item">
                 <a href="{{route('home.contact')}}" class="navigation__link">Contact</a>
               </li>
-                        @guest
-            <div class="border-top mt-auto pb-2 bg-soft-blue">
+            </ul>
+          </div>
+        </div>
+  
+        @guest
+            <div class="border-top mt-auto pb-2 ">
               <div class="customer-links container mt-4 mb-2 pb-1">
                 <a href="{{route('login')}}" class="header-tools__item">
                   <svg class="d-inline-block align-middle" width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -391,7 +385,7 @@
               </div>
             </div>
             @else
-            <div class="border-top mt-auto pb-2 bg-soft-blue">
+            <div class="border-top mt-auto pb-2 ">
               <div class="customer-links container mt-4 mb-2 pb-1">
               <a href="{{Auth::user()->utype === 'ADM' ? route('admin.index'): route('user.index') }}" class="header-tools__item">
                 <span class="pr-6px">{{Auth::user()->name}}</span>
@@ -408,20 +402,21 @@
         </div>
       </nav>
     </div>
- 
-    <header id="header" class="header header-fullwidth bg-soft-blue">
+  
+  
+    <header id="header" class="header header-fullwidth header-transparent-bg">
       <div class="container">
         <div class="header-desk header-desk_type_1">
-        <div class="logo d-flex align-items-center gap-2">
+          <div class="logo">
             <a href="{{route('home.index')}}">
-              <img src="{{ asset('images/logo/logo_3.png') }}" alt="Uomo" class="logo__image d-block" />
+              <img src="{{ asset('assets/images/logorg.webp') }}" alt="RafliGarden" class="logo__image d-block" />
             </a>
             <a href="{{route('home.index')}}">
-              <img src="{{ asset('images/logo/logo_2.png') }}" alt="Uomo" class="logo__image d-block" />
-            </a>
-        </div>
- 
-          <nav class="navigation bg-soft-blue">
+            <img src="{{ asset('assets/images/logo-poltek.png') }}" alt="RafliGarden" class="logo__image d-block" />
+          </a>
+          </div>
+  
+          <nav class="navigation">
             <ul class="navigation__list list-unstyled d-flex">
               <li class="navigation__item">
                 <a href="{{route('home.index')}}" class="navigation__link">Home</a>
@@ -432,13 +427,14 @@
               <li class="navigation__item">
                 <a href="{{route('cart.index')}}" class="navigation__link">Cart</a>
               </li>
+
               <li class="navigation__item">
                 <a href="{{route('home.contact')}}" class="navigation__link">Contact</a>
               </li>
             </ul>
           </nav>
   
-          <div class="header-tools d-flex align-items-center bg-soft-blue">
+          <div class="header-tools d-flex align-items-center">
             <div class="header-tools__item hover-container">
               <div class="js-hover__open position-relative">
                 <a class="js-search-popup search-field__actor" href="#">
@@ -450,7 +446,7 @@
                 </a>
               </div>
   
-            <div class="search-popup js-hidden-content">
+              <div class="search-popup js-hidden-content">
                 <form action="#" method="GET" class="search-field container">
                   <p class="text-uppercase text-secondary fw-medium mb-4">What are you looking for?</p>
                   <div class="position-relative">
@@ -520,19 +516,19 @@
     @yield("content")
   
     <hr class="mt-5 text-secondary" />
-    <footer class="footer footer_type_2 bg-soft-blue">
-        <div class="footer-top py-0">
-          <div class="footer-middle container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center gap-0 py-0">
-              <div class="logo me-4 d-flex align-items-center">
-                <a href="{{ route('home.index') }}">
-                  <img src="{{ asset('images/logo/logo_2.png') }}" alt="SurfsideMedia" class="logo__image d-block" style="height: 200%; max-height: 200px;" />
-                </a>
-              </div>
-              <div class="footer-info text-center text-md-start" style="font-size: 1.1rem;">
-                <p class="mb-1 fw-bold">JL Imam Bonjol No.36 3/1 Kudaile. Kec. Slawi, Kab. Tegal</p>
-                <p class="mb-1 fw-bold">udhasan@gmail.com</p>
-                <p class="mb-3 fw-bold">(0283) 3317791</p>
+    <footer class="footer footer_type_2">
+      <div class="footer-middle container">
+        <div class="row row-cols-lg-5 row-cols-2">
+          <div class="footer-column footer-store-info col-12 mb-4 mb-lg-0">
+            <div class="logo">
+              <a href="{{route('home.index')}}">
+                <img src="{{ asset('assets/images/logorg.webp') }}" alt="RafliGarden" class="logo__image d-block" />
+              </a>
+            </div>
+            <div class="footer-info text-center text-md-start" style="font-size: 1.1rem;">
+                <p class="mb-1 fw-bold">Jl.Wisanggeni, Kota Tegal</p>
+                <p class="mb-1 fw-bold">rafligarden3@@gmail.com</p>
+                <p class="mb-3 fw-bold">082314829208</p>
                 <ul class="social-links list-unstyled d-flex justify-content-center justify-content-md-start gap-3 mb-0">
                   <li><a href="#" class="footer__social-link d-block"><svg class="svg-icon" width="24" height="24"><use href="#icon_facebook" /></svg></a></li>
                   <li><a href="#" class="footer__social-link d-block"><svg class="svg-icon" width="24" height="24"><use href="#icon_twitter" /></svg></a></li>
@@ -541,22 +537,21 @@
                   <li><a href="#" class="footer__social-link d-block"><svg class="svg-icon" width="24" height="24"><use href="#icon_pinterest" /></svg></a></li>
                 </ul>
               </div>
-            </div>
+              </div>
+          </div>
+  
+      <div class="footer-bottom">
+        <div class="container d-md-flex align-items-center">
+          <span class="footer-copyright me-auto">© E-Commerce RafliGarden x Program Studi D3 Teknik Komputer / Poltek Harber</span>
+          <div class="footer-settings d-md-flex align-items-center">
+            <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="terms-conditions.html">Terms &amp;
+              Conditions</a>
           </div>
         </div>
-        <div class="footer-bottom py-3 bg-light text-dark">
-          <div class="container d-md-flex align-items-center justify-content-between text-center text-md-start">
-            <span class="mb-2 mb-md-0 d-block">
-              © UD HS Pecah Belah x Program Studi D3 Teknik Komputer / Poltek Harber.
-            </span>
-            <div class="footer-settings">
-              <a href="privacy-policy.html">Privacy Policy</a>
-              &nbsp;|&nbsp;
-              <a href="terms-conditions.html">Terms &amp; Conditions</a>
-            </div>
-          </div>
-        </div>
+      </div>
     </footer>
+  
+  
     <footer class="footer-mobile container w-100 px-5 d-md-none bg-body">
       <div class="row text-center">
         <div class="col-4">

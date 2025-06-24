@@ -8,12 +8,12 @@
     color: red !important;
   }
   </style>
-<main class="pt-100">
+<main class="pt-90">
     <div class="mb-4 pb-4"></div>
     <section class="shop-checkout container">
       <h2 class="page-title">Cart</h2>
       <div class="checkout-steps">
-        <a href="{{route('cart.index')}}" class="checkout-steps__item active">
+        <a href="javascript:void(0)" class="checkout-steps__item active">
           <span class="checkout-steps__item-number">01</span>
           <span class="checkout-steps__item-title">
             <span>Shopping Bag</span>
@@ -27,7 +27,7 @@
             <em>Checkout Your Items List</em>
           </span>
         </a>
-        <a href="{{route('cart.order.confirmation')}}" class="checkout-steps__item">
+        <a href="javascript:void(0)" class="checkout-steps__item">
           <span class="checkout-steps__item-number">03</span>
           <span class="checkout-steps__item-title">
             <span>Confirmation</span>
@@ -42,7 +42,7 @@
             <thead>
               <tr>
                 <th>Product</th>
-                <th>Name</th>
+                <th></th>
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Subtotal</th>
@@ -54,13 +54,14 @@
               <tr>
                 <td>
                   <div class="shopping-cart__product-item">
-                    <img loading="lazy" src="{{asset('uploads/products')}}/{{$item->model->image}}" width="120" height="120" alt="{{$item->name}}" />
+                    <img loading="lazy" src="{{asset('uploads/products/thumbnails')}}/{{$item->model->image}}" width="120" height="120" alt="{{$item->name}}" />
                   </div>
                 </td>
                 <td>
                   <div class="shopping-cart__product-item__detail">
                     <h4>{{$item->name}}</h4>
                     <ul class="shopping-cart__product-item__options">
+                      
                     </ul>
                   </div>
                 </td>

@@ -47,7 +47,8 @@
                             <th>Price</th>
                             <th>SalePrice</th>
                             <th>SKU</th>
-                            <th>Subcategory</th>
+                            <th>Category</th>
+                            <th>Brand</th>
                             <th>Featured</th>
                             <th>Stock</th>
                             <th>Quantity</th>
@@ -60,7 +61,7 @@
                             <td>{{$product->id}}</td>
                             <td class="pname">
                                 <div class="image">
-                                    <img src="{{asset('uploads/products')}}/{{$product->image}}" alt="{{$product->name}}" class="image">
+                                    <img src="{{asset('uploads/products/thumbnails')}}/{{$product->image}}" alt="{{$product->name}}" class="image">
                                 </div>
                                 <div class="name">
                                     <a href="#" class="body-title-2">{{$product->name}}</a>
@@ -70,7 +71,8 @@
                             <td>Rp {{ number_format($product->regular_price, 0, ',', '.') }}</td>
                             <td>Rp {{ number_format($product->sale_price, 0, ',', '.') }}</td>
                             <td>{{$product->SKU}}</td>
-                            <td>{{$product->name}}</td>
+                            <td>{{$product->category->name}}</td>
+                            <td>{{$product->brand->name}}</td>
                             <td>{{$product->featured == 0 ? "No":"Yes"}}</td>
                             <td>{{$product->stock_status}}</td>
                             <td>{{$product->quantity}}</td>

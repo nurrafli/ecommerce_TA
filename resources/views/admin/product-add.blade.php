@@ -50,21 +50,35 @@
                 @error('slug') <span class="alert alert-danger text-center">{{$message}}@enderror
 
                 <div class="gap22 cols">
-                    <fieldset class="subcategory">
-                        <div class="body-title mb-10">SubCategory <span class="tf-color-1">*</span>
+                    <fieldset class="category">
+                        <div class="body-title mb-10">Category <span class="tf-color-1">*</span>
                         </div>
                         <div class="select">
-                            <select class="" name="subcategory_id">
+                            <select class="" name="category_id">
                                 <option>Choose category</option>
-                                @foreach($subcategories as $subcategory)
-                                <option value="{{$subcategory->id}}">{{$subcategory->name}}</option>
+                                @foreach($categories as $category)
+                                <option value="{{$category->id}}">{{$category->name}}</option>
                                 @endforeach
 
                             </select>
                         </div>
                     </fieldset>
-                    @error('subcategory_id') <span class="alert alert-danger text-center">{{$message}}@enderror
+                    @error('category_id') <span class="alert alert-danger text-center">{{$message}}@enderror
 
+                    <fieldset class="brand">
+                        <div class="body-title mb-10">Brand <span class="tf-color-1">*</span>
+                        </div>
+                        <div class="select">
+                            <select class="" name="brand_id">
+                                <option>Choose Brand</option>
+                                @foreach ($brands as $brand)
+                                <option value="{{$brand->id}}">{{$brand->name}}</option>
+                                @endforeach
+                                
+                            </select>
+                        </div>
+                    </fieldset>
+                    @error('brand_id') <span class="alert alert-danger text-center">{{$message}}@enderror
                 </div>
 
                 <fieldset class="shortdescription">

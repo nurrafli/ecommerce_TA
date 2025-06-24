@@ -2,16 +2,17 @@
 @section('content')
 <main class="pt-95">
     <div class="mb-4 pb-4"></div>
-    <section class="shop-checkout container">
-        <h2 class="page-title">Shipping and Checkout</h2>
-        <div class="checkout-steps">
-            <a href="{{route('cart.index')}}" class="checkout-steps__item active">
-                <span class="checkout-steps__item-number">01</span>
-                <span class="checkout-steps__item-title">
-                    <span>Shopping Bag</span>
-                    <em>Manage Your Items List</em>
-                </span>
-            </a>
+    <section class="shop-checkout container" style="margin-top: 100px;">
+    <h2 class="page-title">Shipping and Checkout</h2>
+    <div class="checkout-steps">
+        <a href="{{route('cart.index')}}" class="checkout-steps__item active">
+            <span class="checkout-steps__item-number">01</span>
+            <span class="checkout-steps__item-title">
+                <span>Shopping Bag</span>
+                <em>Manage Your Items List</em>
+            </span>
+        </a>
+
             <a href="javascript:void(0)" class="checkout-steps__item active">
                 <span class="checkout-steps__item-number">02</span>
                 <span class="checkout-steps__item-title">
@@ -161,7 +162,7 @@
                         <h4>Select Payment Method</h4>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="mode" value="card" id="mode1" required>
-                            <label class="form-check-label" for="mode1">E-Wallet</label>
+                            <label class="form-check-label" for="mode1">Mobile Banking</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="mode" value="cod" id="mode3" required>
@@ -169,7 +170,7 @@
                         </div>
                         <div class="policy-text mt-2">
                             Your personal data will be used to process your order, support your experience throughout this
-                            website, and for other purposes described in our.
+                            website, and for other purposes described in our <a href="terms.html" target="_blank">privacy policy</a>.
                         </div>
                     </div>
 

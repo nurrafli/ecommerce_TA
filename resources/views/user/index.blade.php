@@ -2,10 +2,8 @@
 
 @section('content')
 <style>
-    .form-control:focus {
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
-    }
+    
+   
     @media (max-width: 768px) {
         .page-title {
             font-size: 1.5rem;

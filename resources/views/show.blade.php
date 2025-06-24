@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-<main class="pt-100">
+<main class="pt-90">
       <section class="shop-checkout container">
       <h2 class="page-title">Order Received</h2>
       <div class="checkout-steps">
@@ -55,6 +55,16 @@
             <label>Payment Method</label>
             <span>{{ $order->transaction?->mode ?? '-' }}</span>
         </div>
+
+        <div class="order-info__item">
+            <label>Status </label>
+            <span>{{ $order->transaction->status }}</span>
+        </div>
+
+        <div class="order-info__item">
+            <label>Payment Status</label>
+            <span>{{ $order->transaction->payment_status }}</span>
+        </div>
         </div>
         <div class="checkout__totals-wrapper">
           <div class="checkout__totals">
@@ -67,7 +77,7 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($order->items as $item)
+                @foreach ($order->orderItems as $item)
                 <tr>
                   <td>
                     {{$item->product->name}} x {{$item->quantity}}
@@ -105,7 +115,7 @@
             </table>
           </div>
         </div>
-         @if ($order->transaction->payment_status == 'unpaid' && $order->transaction->mode != 'cod')
+         @if (  $order->transaction->mode != 'cod')
                         <button class="btn btn-primary" id="pay-button">Bayar Sekarang</button>
         @elseif ($order->transaction->payment_status == 'paid')
                         Pembayaran berhasil
@@ -118,7 +128,7 @@
 @push('scripts')
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
 </script>
-@if ($order->transaction->payment_status == 'unpaid' && $order->transaction->mode != 'cod')
+@if ($order->transaction->mode != 'cod')
 <script>
     const payButton = document.querySelector('#pay-button');
     payButton.addEventListener('click', function(e) {
@@ -127,7 +137,9 @@
         snap.pay('{{ $snapToken }}', {
             // Optional
             onSuccess: function(result) {
-              window.location.href = '{{route('cart.order.confirmation')}}'
+                 /* You may add your own js here, this is just example */
+                // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                console.log(result)
             },
             // Optional
             onPending: function(result) {

@@ -1,12 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <main>
-  <style>
-    .bg-soft.blue{
-      background: linear-gradient(to right, #efeaec, #a0c4ff);
-    }
-  </style>
-    <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow " style="margin-top: -130px" data-settings='{
+
+    <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow" data-settings='{
         "autoplay": {
           "delay": 5000
         },
@@ -31,7 +27,7 @@
             </div>
             <div class="slideshow-text container position-absolute start-50 top-50 translate-middle">
               <h6 class="text_dash text-uppercase fs-base fw-medium animate animate_fade animate_btt animate_delay-3">
-                New Arrivals</h6>
+                New!</h6>
               <h2 class="h1 fw-normal mb-0 animate animate_fade animate_btt animate_delay-5">{{$slide->title}}</h2>
               <h2 class="h1 fw-bold animate animate_fade animate_btt animate_delay-5">{{$slide->subtitle}}</h2>
               <a href="{{$slide->link}}"
@@ -49,61 +45,86 @@
         </div>
       </div>
     </section>
-    <div class="container mw-1620 bg-soft-blue border-radius-10">
+    <div class="container mw-1620 bg-white border-radius-10">
       <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-    <style>
-      .category-circle {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 2px solid #ccc;
-      }
+      <section class="category-carousel container">
+        <h2 class="section-title text-center mb-3 pb-xl-2 mb-xl-4">You Might Like</h2>
 
-      .category-circle img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+        <div class="position-relative">
+          <div class="swiper-container js-swiper-slider" data-settings='{
+              "autoplay": {
+                "delay": 5000
+              },
+              "slidesPerView": 8,
+              "slidesPerGroup": 1,
+              "effect": "none",
+              "loop": true,
+              "navigation": {
+                "nextEl": ".products-carousel__next-1",
+                "prevEl": ".products-carousel__prev-1"
+              },
+              "breakpoints": {
+                "320": {
+                  "slidesPerView": 2,
+                  "slidesPerGroup": 2,
+                  "spaceBetween": 15
+                },
+                "768": {
+                  "slidesPerView": 4,
+                  "slidesPerGroup": 4,
+                  "spaceBetween": 30
+                },
+                "992": {
+                  "slidesPerView": 6,
+                  "slidesPerGroup": 1,
+                  "spaceBetween": 45,
+                  "pagination": false
+                },
+                "1200": {
+                  "slidesPerView": 8,
+                  "slidesPerGroup": 1,
+                  "spaceBetween": 60,
+                  "pagination": false
+                }
+              }
+            }'>
+            <div class="swiper-wrapper">
+              @foreach ($categories as $category)
+              <div class="swiper-slide">
+                <img loading="lazy" class="w-100 h-auto mb-3" src="{{ asset('uploads/categories') }}/{{$category->image}}" width="124"
+                  height="124" alt="" />
+                <div class="text-center">
+                  <a href="{{route('shop.index',['categories'=>$category->id])}}" class="menu-link fw-medium">{{$category->name}}</a>
+                </div>
+              </div>
+              @endforeach
+            </div><!-- /.swiper-wrapper -->
+          </div><!-- /.swiper-container js-swiper-slider -->
 
-      .category-link {
-        color: #333;
-        text-decoration: none;
-        font-size: 1rem;
-        text-align: center;
-      }
-
-    </style>
-
-    <section class="category-carousel container text-center my-5">
-      <h2 class="section-title mb-4 fw-bold">Kategori Produk</h2>
-      <div class="d-flex flex-wrap justify-content-center gap-4">
-        @foreach ($categories as $category)
-          <div class="d-flex flex-column align-items-center">
-            <div class="category-circle">
-              <img loading="lazy" src="{{ asset('uploads/categories') }}/{{ $category->image }}"
-                  alt="{{ $category->name }}">
-            </div>
-            <a href="{{ route('shop.index', ['categories' => $category->id]) }}" class="category-link fw-bold mt-2">
-              {{ $category->name }}
-            </a>
-          </div>
-        @endforeach
-      </div>
-    </section>
+          <div
+            class="products-carousel__prev products-carousel__prev-1 position-absolute top-50 d-flex align-items-center justify-content-center">
+            <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
+              <use href="#icon_prev_md" />
+            </svg>
+          </div><!-- /.products-carousel__prev -->
+          <div
+            class="products-carousel__next products-carousel__next-1 position-absolute top-50 d-flex align-items-center justify-content-center">
+            <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
+              <use href="#icon_next_md" />
+            </svg>
+          </div><!-- /.products-carousel__next -->
+        </div><!-- /.position-relative -->
+      </section>
 
       <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
       <section class="hot-deals container">
-        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Collection</h2>
+        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Hot Deals</h2>
         <div class="row">
           <div
             class="col-md-6 col-lg-4 col-xl-20per d-flex align-items-center flex-column justify-content-center py-4 align-items-md-start">
-            <h2>Produk Toko</h2>
-            <h2 class="fw-bold">Pecah Belah</h2>
+            <h2>All Products</h2>
+            <h2 class="fw-bold">Best Price!</h2>
 
             <div class="position-relative d-flex align-items-center text-center pt-xxl-4 js-countdown mb-3"
               data-date="18-3-2024" data-time="06:50">
@@ -201,10 +222,8 @@
 
       <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
-      <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
       <section class="products-grid container">
-        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Featured Products</h2>
+        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Best Seller Products</h2>
 
         <div class="row">
           @foreach ($fproducts as $fproduct)

@@ -6,13 +6,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Middleware\AuthAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LaporanController;
 
-Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);
+
 Auth::routes();
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
@@ -46,30 +45,21 @@ Route::post('/contact.store', [HomeController::class, 'contact_store'])->name('h
 Route::get('/search', [HomeController::class, 'search'])->name('home.search');
 
 Route::middleware(['auth'])->group(function(){
-    Route::put('/user/account', [UserController::class, 'updateAccount'])->name('user.account.update');
     Route::get('/account-dashboard', [UserController::class, 'index'])->name('user.index');
     Route::get('/account-orders', [UserController::class, 'orders'])->name('user.orders');
     Route::get('/account-order/{order_id}/details', [UserController::class, 'order_details'])->name('user.order.details');
     Route::put('/account-order/cancel-order',[UserController::class,'order_cancel'])->name('user.order.cancel');
-    Route::get('/account/addresses', [UserController::class, 'addresses'])->name('user.addresses');
-    Route::get('/account/addresses/{address}/edit', [UserController::class, 'editAddress'])->name('user.addresses.edit');
-    Route::put('/account/addresses/{address}', [UserController::class, 'updateAddress'])->name('user.addresses.update');
-    Route::delete('/account/addresses/{address}', [UserController::class, 'destroy'])->name('user.addresses.destroy');
-
     
 });
 
 Route::middleware(['auth', AuthAdmin::class])->group(function(){
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    Route::get('/subcategories', [AdminController::class, 'subcategories'])->name('admin.subcategories');
-    Route::get('/subcategories/add', [AdminController::class, 'add_subcategory'])->name('admin.subcategories.add');
-    Route::post('/subcategories/store', [AdminController::class, 'subcategory_store'])->name('admin.subcategories.store');
-    Route::get('/subcategories/edit/{id}', [AdminController::class, 'edit_subcategory'])->name('admin.subcategories.edit');
-    Route::put('/subcategories/update', [AdminController::class, 'update_subcategory'])->name('admin.subcategories.update');
-    Route::delete('/subcategories/delete/{id}', [AdminController::class, 'delete_subcategory'])->name('admin.subcategories.delete');
-
-    Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
-    Route::get('admin/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.exportPdf');
+    Route::get('/admin/brands', [AdminController::class,'brands'])->name('admin.brands');
+    Route::get('/admin/brand/add', [AdminController::class,'add_brand'])->name('admin.brand.add');
+    Route::post('/admin/brand/store', [AdminController::class, 'brand_store'])->name('admin.brand.store');
+    Route::get('/admin/brand/edit/{id}', [AdminController::class,'brand_edit'])->name('admin.brand.edit');
+    Route::put('/admin/brand/update', [AdminController::class,'brand_update'])->name('admin.brand.update');
+    Route::delete('/admin/brand/delete/{id}/delete', [AdminController::class,'brand_delete'])->name('admin.brand.delete');
 
     Route::get('/admin/categories',[AdminController::class,'categories'])->name('admin.categories');
     Route::get('/admin/category/add',[AdminController::class, 'category_add'])->name('admin.category.add');
@@ -107,4 +97,11 @@ Route::middleware(['auth', AuthAdmin::class])->group(function(){
     Route::delete('/admin/contact/{id}/delete',[AdminController::class,'contact_delete'])->name('admin.contact.delete');
 
     Route::get('/admin/search',[AdminController::class,'search'])->name('admin.search');
+
+
+    
+    Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
+    Route::get('admin/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.exportPdf');
+
+
 });
