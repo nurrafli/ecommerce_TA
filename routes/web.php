@@ -45,10 +45,16 @@ Route::post('/contact.store', [HomeController::class, 'contact_store'])->name('h
 Route::get('/search', [HomeController::class, 'search'])->name('home.search');
 
 Route::middleware(['auth'])->group(function(){
+    Route::put('/user/account', [UserController::class, 'updateAccount'])->name('user.account.update');
     Route::get('/account-dashboard', [UserController::class, 'index'])->name('user.index');
     Route::get('/account-orders', [UserController::class, 'orders'])->name('user.orders');
     Route::get('/account-order/{order_id}/details', [UserController::class, 'order_details'])->name('user.order.details');
     Route::put('/account-order/cancel-order',[UserController::class,'order_cancel'])->name('user.order.cancel');
+    Route::get('/account/addresses', [UserController::class, 'addresses'])->name('user.addresses');
+    Route::get('/account/addresses/{address}/edit', [UserController::class, 'editAddress'])->name('user.addresses.edit');
+    Route::put('/account/addresses/{address}', [UserController::class, 'updateAddress'])->name('user.addresses.update');
+    Route::delete('/account/addresses/{address}', [UserController::class, 'destroy'])->name('user.addresses.destroy');
+
     
 });
 
