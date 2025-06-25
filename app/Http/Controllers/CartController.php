@@ -8,12 +8,10 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Transaction;
-use App\Services\MidtransService;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Midtrans\Snap;
 use Midtrans\Config;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 
@@ -61,7 +59,7 @@ class CartController extends Controller
     }   
 
     public function apply_coupon_code(Request $request)
-    {
+{
     $coupon_code = $request->coupon_code;
 
     if (isset($coupon_code)) {
@@ -94,7 +92,7 @@ class CartController extends Controller
     } else {
         return redirect()->back()->with('error', 'Invalid coupon code!');
     }
-    }
+}
 
     public function calculateDiscount()
     {
@@ -123,9 +121,9 @@ class CartController extends Controller
                 'subtotal' => number_format(floatval($subtotalAfterDiscount), 2, '.', ''),
                 'tax' => number_format(floatval($taxAfterDiscount), 2, '.', ''),
                 'total' => number_format(floatval($totalAfterDiscount), 2, '.', '')
-                ]);
-        }
+            ]);
     }
+}
 
 
     public function remove_coupon_code()
@@ -143,7 +141,7 @@ class CartController extends Controller
         }
 
         $addresses = Address::where('user_id',Auth::user()->id)->get();
-        return view('checkout', compact('addresses'));
+        return view('checkout',compact('addresses'));
     }
 
     public function place_an_order(Request $request)
@@ -199,12 +197,10 @@ class CartController extends Controller
 
         $order = new Order();
         $order->user_id = $user_id;
-        $order->order_id = 'ORD-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4)); // kode unik
         $order->subtotal = str_replace(',', '', $checkout['subtotal']);
         $order->discount = str_replace(',', '', $checkout['discount']);
         $order->tax = str_replace(',', '', $checkout['tax']);
         $order->total = str_replace(',', '', $checkout['total']);
-
 
         // Isi alamat dari data address
         $order->name = $address->name;
@@ -225,7 +221,6 @@ class CartController extends Controller
             $items->order_id = $order->id;
             $items->price = $item->price;
             $items->quantity = $item->qty;
-            $items->product_name = $item->name;
             $items->save();
         }
 
@@ -245,70 +240,66 @@ class CartController extends Controller
         return redirect()->route('customer.orders.show', ['order' => $order->id]);
     }
 
+public function setAmountforCheckout()
+{
+    if (Cart::instance('cart')->content()->count() <= 0) {
+        Session::forget('checkout');
+        return;
+    }
+
+    if (Session::has('coupon') && Session::has('discounts')) {
+        Session::put('checkout', [
+            'discount' => Session::get('discounts')['discount'],
+            'subtotal' => Session::get('discounts')['subtotal'],
+            'tax' => Session::get('discounts')['tax'],
+            'total' => Session::get('discounts')['total'],
+        ]);
+    } else {
+        Session::put('checkout', [
+            'discount' => 0,
+            'subtotal' => Cart::instance('cart')->subtotal(),
+            'tax' => Cart::instance('cart')->tax(),
+            'total' => Cart::instance('cart')->total(),
+        ]);
+    }
+}
+
+
     public function order_confirmation()
     {
         $orders = Order::with('transaction')
             ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);;
+            ->paginate(5);;
 
         return view('order-confirmation', compact('orders'));
 
     }
 
-public function show(MidtransService $midtransService, Order $order)
-{
-    // Ambil pembayaran terakhir
-    $payment = $order->payments()->latest()->first();
-
-    // Cek apakah belum ada pembayaran atau statusnya expired
-    if (!$payment || $payment->status === 'EXPIRED') {
-
-        try {
-            // Buat Snap Token baru
-            $snapToken = $midtransService->createSnapToken($order);
-
-            // Simpan ke tabel payments
-            $order->payments()->create([
-                'snap_token' => $snapToken,
-                'status' => 'PENDING',
-            ]);
-        } catch (\Exception $e) {
-            // Tangani jika gagal membuat token (misal item name terlalu panjang, dsb)
-            return back()->withErrors(['midtrans' => 'Gagal membuat Snap Token: ' . $e->getMessage()]);
-        }
-
-    } else {
-        // Jika pembayaran sebelumnya masih aktif, pakai token yang ada
-        $snapToken = $payment->snap_token;
-    }
-
-    return view('show', compact('order', 'snapToken'));
-}
-
-
-    public function setAmountforCheckout()
+    public function show($id)
     {
-        if (Cart::instance('cart')->content()->count() <= 0) {
-            Session::forget('checkout');
-            return;
-        }
+        $order = Order::findOrFail($id);
+        $user = $order->user;
 
-        if (Session::has('coupon') && Session::has('discounts')) {
-            Session::put('checkout', [
-                'discount' => Session::get('discounts')['discount'],
-                'subtotal' => Session::get('discounts')['subtotal'],
-                'tax' => Session::get('discounts')['tax'],
-                'total' => Session::get('discounts')['total'],
-            ]);
-        } else {
-            Session::put('checkout', [
-                'discount' => 0,
-                'subtotal' => Cart::instance('cart')->subtotal(),
-                'tax' => Cart::instance('cart')->tax(),
-                'total' => Cart::instance('cart')->total(),
-            ]);
-        }
+        Config::$serverKey = config('services.midtrans.server_key');
+        Config::$isProduction = config('services.midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'ORD'. '-' . $order->id . '-' . time(),
+                'gross_amount' => (int) $order->total,
+            ],
+            'customer_details' => [
+                'first_name' => $user->name,
+                'email' => $user->email,
+            ],
+            'enabled_payments' => ['gopay', 'shopeepay', 'credit_card','bank_transfer'],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+        return view('show', compact('snapToken', 'order'));
     }
 
 }
