@@ -106,7 +106,7 @@ Route::middleware(['auth', AuthAdmin::class])->group(function(){
 
 
     
-    Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
+    Route::get('admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
     Route::get('admin/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.exportPdf');
 
 
