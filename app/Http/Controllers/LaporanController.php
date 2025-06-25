@@ -27,7 +27,7 @@ class LaporanController extends Controller
 
         $transactions = $query->orderBy('created_at', 'desc')->get();
 
-        return view('admin.laporan.index', compact('transactions'));
+        return view('admin.laporan', compact('transactions'));
     }
 
     public function exportPdf(Request $request)
