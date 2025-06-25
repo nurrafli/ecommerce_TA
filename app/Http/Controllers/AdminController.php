@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Subcategory;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Coupon;
@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Modifiers\ResizeModifier;
+use Intervention\Image\Modifiers\CropModifier;
 
 
 class AdminController extends Controller
@@ -84,90 +86,89 @@ class AdminController extends Controller
         ));
     }
 
-    public function subcategories()
+
+    public function brands()
     {
-        $subcategories = Subcategory::whereNotNull('parent_id')->orderBy('id', 'DESC')->paginate(10);
-        return view('admin.subcategories', compact('subcategories'));
+        $brands = Brand::orderBy('id','DESC')->paginate(10);
+        return view('admin.brands', compact('brands'));
     }
 
-    public function add_subcategory()
+    public function add_brand()
     {
-        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
-        return view('admin.subcategory-add', compact('categories'));
+        return view('admin.brand-add');
     }
 
-    public function subcategory_store(Request $request)
+    public function brand_store(Request $request){
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required|unique:brands,slug',
+            'image' => 'mimes:png,jpg,jpeg|max:3000',
+        ]);
+
+        $brand = new Brand();
+        $brand->name = $request->name;
+        $brand->slug = Str::slug($request->name);
+        $image = $request->file('image');
+        $file_extention = $request->file('image')->extension();
+        $file_name = Carbon::now()->timestamp.'.'.$file_extention;
+        $this->GenerateBrandThumbailsImage($image,$file_name);
+        $brand->image = $file_name;
+        $brand->save();
+        return redirect()->route('admin.brands')->with('status', 'Brand has been added succesfully');
+    }
+
+    public function brand_edit($id)
+    {
+        $brand = Brand::findOrFail($id);
+        return view('admin.brand-edit', compact('brand'));
+    }
+
+    public function brand_update(Request $request)
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:categories,slug',
-            'parent_id' => 'required|exists:categories,id',
-            'image' => 'nullable|mimes:png,jpg,jpeg|max:3000',
+            'slug' => 'required|unique:brands,slug,'.$request->id,
+            'image' => 'mimes:png,jpg,jpeg|max:3000',
         ]);
 
-        $subcategory = new Subcategory();
-        $subcategory->name = $request->name;
-        $subcategory->slug = Str::slug($request->name);
-        $subcategory->parent_id = $request->parent_id;
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $file_name = Carbon::now()->timestamp . '.' . $image->extension();
-            $this->generateThumbnailImage($image, $file_name);
-            $subcategory->image = $file_name;
-        }
-
-        $subcategory->save();
-        return redirect()->route('admin.subcategories')->with('status', 'Subcategory added successfully');
-    }
-
-    public function edit_subcategory($id)
-    {
-        $subcategory = Subcategory::findOrFail($id);
-        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
-        return view('admin.subcategory-edit', compact('subcategory', 'categories'));
-    }
-
-    public function update_subcategory(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|exists:subcategories,id',
-            'name' => 'required',
-            'slug' => 'required|unique:subcategories,slug,' . $request->id,
-            'parent_id' => 'required|exists:categories,id',
-            'image' => 'nullable|mimes:png,jpg,jpeg|max:3000',
-        ]);
-
-        $subcategory = Subcategory::find($request->id);
-        $subcategory->name = $request->name;
-        $subcategory->slug = Str::slug($request->name);
-        $subcategory->parent_id = $request->parent_id;
-
-        if ($request->hasFile('image')) {
-            if (File::exists(public_path('uploads/categories/' . $subcategory->image))) {
-                File::delete(public_path('uploads/categories/' . $subcategory->image));
+        $brand = Brand::find($request->id);
+        $brand->name = $request->name;
+        $brand->slug = Str::slug($request->name);
+        if($request->hasFile('image')){
+            if(File::exists(public_path('uploads/brands').'/'.$brand->image))
+            {
+                File::delete(public_path('uploads/brands').'/'.$brand->image);
             }
-
             $image = $request->file('image');
-            $file_name = Carbon::now()->timestamp . '.' . $image->extension();
-            $this->generateThumbnailImage($image, $file_name);
-            $subcategory->image = $file_name;
+            $file_extention = $request->file('image')->extension();
+            $file_name = Carbon::now()->timestamp.'.'.$file_extention;
+            $this->GenerateBrandThumbailsImage($image,$file_name);
+            $brand->image = $file_name;
         }
-
-        $subcategory->save();
-        return redirect()->route('admin.subcategories')->with('status', 'Subcategory updated successfully');
+        
+        $brand->save();
+        return redirect()->route('admin.brands')->with('status', 'Brand has been updated succesfully');
     }
 
-    public function delete_subcategory($id)
+    public function GenerateBrandThumbailsImage($image, $imageName)
     {
-        $subcategory = Subcategory::find($id);
+        $destinationPath = public_path('uploads/brands');
+        $img = Image::read($image->path());
+        $img->cover(124,124,"top");
+        $img->resize(124,124,function($constraint){
+            $constraint->aspectRatio();
+        })->save($destinationPath.'/'.$imageName);
+    }
 
-        if ($subcategory && $subcategory->image && File::exists(public_path('uploads/categories/' . $subcategory->image))) {
-            File::delete(public_path('uploads/categories/' . $subcategory->image));
+    public function brand_delete($id)
+    {
+        $brand = Brand::find($id);
+        if(File::exists(public_path('uploads/brands').'/'.$brand->image))
+        {
+            File::delete(public_path('uploads/brands').'/'.$brand->image);
         }
-
-        $subcategory->delete();
-        return redirect()->route('admin.subcategories')->with('status', 'Subcategory deleted successfully');
+        $brand->delete();
+        return redirect()->route('admin.brands')->with('status', 'Brand has been deleted succesfully!');
     }
 
     public function categories()
@@ -192,7 +193,6 @@ class AdminController extends Controller
         $category = new Category();
         $category->name = $request->name;
         $category->slug = Str::slug($request->name);
-        $category->parent_id = null;
         $image = $request->file('image');
         $file_extention = $request->file('image')->extension();
         $file_name = Carbon::now()->timestamp.'.'.$file_extention;
@@ -263,8 +263,9 @@ class AdminController extends Controller
 
     public function product_add()
     {
-        $subcategories = Subcategory::select('id','name')->orderBy('name')->get();
-        return view('admin.product-add',compact('subcategories'));
+        $categories = Category::select('id','name')->orderBy('name')->get();
+        $brands = Brand::select('id','name')->orderBy('name')->get();
+        return view('admin.product-add',compact('categories','brands'));
     }
 
     public function product_store(Request $request)
@@ -283,7 +284,8 @@ class AdminController extends Controller
             'image' => 'required|image|mimes:jpg,jpeg,png|max:3000',
             'images' => 'required|array',
             'images.*' => 'mimes:jpg,jpeg,png|max:3000',
-            'subcategory_id' =>'required',
+            'category_id' =>'required',
+            'brand_id' =>'required'
         ]);
         
 
@@ -298,7 +300,8 @@ class AdminController extends Controller
         $product -> stock_status = $request-> stock_status;
         $product -> featured = $request-> featured;
         $product -> quantity = $request-> quantity;
-        $product -> subcategory_id = $request-> subcategory_id;
+        $product -> category_id = $request-> category_id;
+        $product -> brand_id = $request-> brand_id;
 
         $current_timestamp = Carbon::now()->timestamp;
 
@@ -339,28 +342,31 @@ class AdminController extends Controller
 
     public function GenerateProductThumbnailImage($image, $imageName)
     {
-        $destinationPath = public_path('uploads/products'); // Folder penyimpanan
-
-        // Baca gambar asli
+        $destinationPathThumbnail = public_path('uploads/products/thumbnails');
+        $destinationPath = public_path('uploads/products');
         $img = Image::read($image->path());
 
-        // Simpan gambar utama (ukuran asli, kualitas tinggi)
-        $img->save($destinationPath.'/'.$imageName, 90); // Kualitas 90 untuk menjaga file HD
+        $img->resize(540, 689, function($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+        
+        
+        $img->resize(540,689,function($constraint){
+            $constraint->aspectRatio();
+        })->save($destinationPath.'/'.$imageName);
 
-        // Buat nama file thumbnail
-        $thumbnailName = pathinfo($imageName, PATHINFO_FILENAME) . '_thumb.' . pathinfo($imageName, PATHINFO_EXTENSION);
-
-        // Simpan thumbnail tanpa resize (tetap ukuran asli)
-        $img->save($destinationPath.'/'.$thumbnailName, 90); // Hasilnya thumbnail sama dengan gambar asli
-
-
+        $img->resize(104,104,function($constraint){
+            $constraint->aspectRatio();
+        })->save($destinationPathThumbnail.'/'.$imageName);
     }
 
     public function product_edit($id)
     {
         $product = Product::find($id);
-        $subcategories = Subcategory::select('id','name')->orderBy('name')->get();
-        return view('admin.product-edit',compact('product','subcategories'));
+        $categories = Category::select('id','name')->orderBy('name')->get();
+        $brands = Brand::select('id','name')->orderBy('name')->get();
+        return view('admin.product-edit',compact('product','brands','categories'));
     }
 
     public function product_update(Request $request)
@@ -379,7 +385,8 @@ class AdminController extends Controller
             'image' => 'mimes:jpg,jpeg,png|max:3000',
             'images' => 'required|array',
             'images.*' => 'mimes:jpg,jpeg,png|max:3000',
-            'subcategory_id' =>'required',
+            'category_id' =>'required',
+            'brand_id' =>'required'
         ]);
 
         $product = Product::find($request->id);
@@ -393,7 +400,8 @@ class AdminController extends Controller
         $product -> stock_status = $request-> stock_status;
         $product -> featured = $request-> featured;
         $product -> quantity = $request-> quantity;
-        $product -> subcategory_id = $request-> subcategory_id;
+        $product -> category_id = $request-> category_id;
+        $product -> brand_id = $request-> brand_id;
 
         $current_timestamp = Carbon::now()->timestamp;
 
@@ -703,6 +711,5 @@ class AdminController extends Controller
                         ->get();
         return response()->json($results);
     }
+
 }
-
-
