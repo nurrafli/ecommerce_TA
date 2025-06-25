@@ -11,9 +11,7 @@
     }
 </style>
 <main class="pt-5 pb-5">
-    <section class="container my-account">
-        <h2 class="page-title mb-4 text-center">Account Settings</h2>
-        <div class="row">
+    
             
             <!-- Sidebar -->
             <aside class="col-md-3 mb-4">
