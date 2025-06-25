@@ -12,7 +12,7 @@
 </style>
 <main class="pt-150">
     <section class="my-account container">
-        <h2 class="page-title mb-4">Account Settings</h2>
+        <h2 class="page-title mb-4"></h2>
         <div class="row gy-4">
             <!-- Sidebar -->
             <div class="col-12 col-lg-3">
