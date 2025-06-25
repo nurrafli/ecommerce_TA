@@ -17,17 +17,19 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('short_description')->nullable();
             $table->text('description');
-            $table->integer('regular_price');
-            $table->integer('sale_price')->nullable();
+            $table->decimal('regular_price', 10, 2);
+            $table->decimal('sale_price')->nullable();
             $table->string('SKU');
             $table->enum('stock_status',['instock','outofstock']);
             $table->boolean('featured')->default(false);
             $table->unsignedInteger('quantity')->default(10);
             $table->string('image')->nullable();
             $table->text('images')->nullable();
-            $table->bigInteger('subcategory_id')->unsigned()->nullable();
+            $table->bigInteger('category_id')->unsigned()->nullable();
+            $table->bigInteger('brand_id')->unsigned()->nullable();
             $table->timestamps();
-            $table->foreign('subcategory_id')->references('id')->on('subcategories')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade');
         });
     }
 
@@ -36,9 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-        $table->dropForeign(['subcategory_id']);
-        $table->foreign('subcategory_id')->references('id')->on('subcategories')->onDelete('cascade');
-        });
+        Schema::dropIfExists('products');
     }
 };
